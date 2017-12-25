@@ -19,7 +19,7 @@ services:
     image: chorss/docker-pgadmin4
     restart: always
     ports:
-      - '5050:5050'
+      - '5454:5050'
     links:
       - postgres
     volumes:

@@ -12,7 +12,7 @@ const JsonRpcWs = require('json-rpc-ws');
 const client = JsonRpcWs.createClient();
 
 
-const viewList = function(params){
+const viewList = function(pair, params){
   var date = new Date();
   var arr = ['ask', 'bid'];
 
@@ -20,25 +20,28 @@ const viewList = function(params){
     let value = arr[i];
 
     for(j in params[value]){
-      checkOrderbookRaw(params[value][j], `${value}s`, date);
+      checkOrderbookRaw(params[value][j], `${value}s`, date, pair);
     };
   };
 };
 
-const checkOrderbookRaw = function(row, tableName, date){
+const checkOrderbookRaw = function(row, tableName, date, pair){
   let price = row['price'];
   let size = row['size'];
   let queryText = "";
+  let values = [];
 
   if (size > 0) {
-    queryText = `INSERT INTO ${tableName} ("price", "size", "date_from") VALUES($1, $2, $3) RETURNING NULL`;
+    values = [price, size, date, pair];
+
+    queryText = `INSERT INTO ${tableName} ( "price", "size", "date_from", "pair") VALUES($1, $2, $3, $4) RETURNING NULL`;
   }
   else {
-    queryText =  `UPDATE ${tableName} SET "price" = $1, "size" = $2, "date_till" = $3 `;
-    queryText += `WHERE "price" = $1 AND "date_till" IS NULL`;
-  }
+    values = [price, date, pair];
 
-  let values = [row['price'], row['size'], date];
+    queryText =  `UPDATE ${tableName} SET "date_till" = $2`;
+    queryText += `WHERE "price" = $1 AND "date_till" IS NULL AND "pair" = $3`;
+  }
 
   pgClient.query(queryText, values, (err, res) => {
     if(err) {
@@ -47,19 +50,21 @@ const checkOrderbookRaw = function(row, tableName, date){
   });
 };
 
+var currencyPair = "ETHBTC";
+
 client.connect("wss://api.hitbtc.com:443/api/2/ws", function connected () {
-  client.send('subscribeOrderbook', { "symbol": "ETHBTC" }, function mirrorReply (error, reply) {
+  client.send('subscribeOrderbook', { "symbol": currencyPair }, function mirrorReply (error, reply) {
     console.log('Subscribe orderbook reply:', reply);
   });
 
   client.expose('snapshotOrderbook', function snapshotOrderbook(params, reply) {
-    viewList(params)
+    viewList(currencyPair, params);
 
     console.log('Orderbook snapshot received');
   });
 
   client.expose('updateOrderbook', function updateOrderbook(params, reply) {
-    viewList(params)
+    viewList(currencyPair, params);
 
     console.log('Orderbook snapshot updated');
   });
