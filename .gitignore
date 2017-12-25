@@ -1,0 +1,4 @@
+node/localdb.sqlite
+node/node_modules
+node.env
+.env

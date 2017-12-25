@@ -1,0 +1,26 @@
+version: '3'
+services:
+  node:
+    build: node/.
+    #command: node start.js
+    command: tail -f /dev/null
+    env_file:
+      - node.env
+    volumes:
+      - ./node:/myapp
+      - ./shared:/shared
+    links:
+      - postgres
+  postgres:
+    image: postgres:10-alpine
+    env_file:
+      - postgresql.env
+  pgadmin4:
+    image: chorss/docker-pgadmin4
+    restart: always
+    ports:
+      - '5050:5050'
+    links:
+      - postgres
+    volumes:
+      - ./shared:/shared

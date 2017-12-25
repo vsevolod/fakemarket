@@ -1,0 +1,22 @@
+{
+  "name": "fakemarket",
+  "version": "1.0.0",
+  "description": "Market saver",
+  "main": "start.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Vsevolod Avramov",
+  "license": "ISC",
+  "dependencies": {
+    "autobahn": "17.5.2",
+    "hitbtc-api": "^3.0.2",
+    "json-rpc-ws": "^4.0.1",
+    "pg": "^7.4.0",
+    "poloniex-unofficial": "^1.1.2",
+    "ws": "^3.3.3"
+  },
+  "devDependencies": {
+    "babel-preset-es2015": "^6.24.1"
+  }
+}
