@@ -1,11 +1,20 @@
 version: '3'
 services:
+  backend:
+    build: backend/.
+    command: tail -f /dev/null
+    ports:
+      - '4000:4000'
+    volumes:
+      - ./backend:/myapp
+    env_file:
+      - postgresql.env
   node:
     build: node/.
     command: node hitbtc.js
     #command: tail -f /dev/null
     env_file:
-      - node.env
+      - ./node.env
     volumes:
       - ./node:/myapp
       - ./shared:/shared
