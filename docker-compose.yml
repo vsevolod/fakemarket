@@ -2,8 +2,8 @@ version: '3'
 services:
   node:
     build: node/.
-    #command: node start.js
-    command: tail -f /dev/null
+    command: node hitbtc.js
+    #command: tail -f /dev/null
     env_file:
       - node.env
     volumes:

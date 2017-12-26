@@ -39,16 +39,32 @@ const checkOrderbookRaw = function(row, tableName, date, pair){
   else {
     values = [price, date, pair];
 
-    queryText =  `UPDATE ${tableName} SET "date_till" = $2`;
+    queryText =  `UPDATE ${tableName} SET "date_till" = $2 `;
     queryText += `WHERE "price" = $1 AND "date_till" IS NULL AND "pair" = $3`;
   }
 
   pgClient.query(queryText, values, (err, res) => {
     if(err) {
-      console.log('Error: ', err.stack);
+      console.log(`Error with query for ${tableName}: `, err.stack);
     }
   });
 };
+
+const viewTradesList = function(pair, params) {
+  let arr = params['data'];
+
+  for(i in arr){
+    let row = arr[i];
+    let queryText = `INSERT INTO trades ( "id", "price", "quantity", "side", "timestamp") VALUES($1, $2, $3, $4, $5) RETURNING NULL`;
+    let values = [row['id'], row['price'], row['quantity'], row['side'], row['timestamp']];
+
+    pgClient.query(queryText, values, (err, res) => {
+      if(err) {
+        console.log('Error insert into trades: ', err.stack);
+      }
+    });
+  };
+}
 
 var currencyPair = "ETHBTC";
 
@@ -57,6 +73,11 @@ client.connect("wss://api.hitbtc.com:443/api/2/ws", function connected () {
     console.log('Subscribe orderbook reply:', reply);
   });
 
+  client.send('subscribeTrades', { "symbol": currencyPair }, function mirrorReply (error, reply) {
+    console.log('Subscribe trades reply:', reply);
+  });
+
+  // Orderbook
   client.expose('snapshotOrderbook', function snapshotOrderbook(params, reply) {
     viewList(currencyPair, params);
 
@@ -67,5 +88,18 @@ client.connect("wss://api.hitbtc.com:443/api/2/ws", function connected () {
     viewList(currencyPair, params);
 
     console.log('Orderbook snapshot updated');
+  });
+
+  // Trades
+  client.expose('snapshotTrades', function snapshotTrades(params, reply) {
+    viewTradesList(currencyPair, params);
+
+    console.log('Trades snapshot received');
+  });
+
+  client.expose('updateTrades', function updateTrades(params, reply) {
+    viewTradesList(currencyPair, params);
+
+    console.log('Trades snapshot updated');
   });
 });
