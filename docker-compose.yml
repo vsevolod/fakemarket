@@ -1,5 +1,14 @@
 version: '3'
 services:
+  go_backend:
+    build: go_backend/.
+    command: tail -f /dev/null
+    ports:
+      - '80:1323'
+    volumes:
+      - ./go_backend:/go/src/github.com/vsevolod/fakemarket/go_backend
+    env_file:
+      - postgresql.env
   backend:
     build: backend/.
     command: tail -f /dev/null

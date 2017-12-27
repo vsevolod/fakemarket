@@ -2,3 +2,5 @@ backend/node_modules
 node/node_modules
 node.env
 .env
+go_backend/config.yml
+go_backend/vendor
