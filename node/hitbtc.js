@@ -69,28 +69,28 @@ const viewTradesList = function(pair, params) {
 var currencyPair = "ETHBTC";
 
 client.connect("wss://api.hitbtc.com:443/api/2/ws", function connected () {
-  client.send('subscribeOrderbook', { "symbol": currencyPair }, function mirrorReply (error, reply) {
-    console.log('Subscribe orderbook reply:', reply);
-  });
 
+  // Orderbook
+  //client.send('subscribeOrderbook', { "symbol": currencyPair }, function mirrorReply (error, reply) {
+  //  console.log('Subscribe orderbook reply:', reply);
+  //});
+  //client.expose('snapshotOrderbook', function snapshotOrderbook(params, reply) {
+  //  viewList(currencyPair, params);
+
+  //  console.log('Orderbook snapshot received');
+  //});
+
+  //client.expose('updateOrderbook', function updateOrderbook(params, reply) {
+  //  viewList(currencyPair, params);
+
+  //  console.log('Orderbook snapshot updated');
+  //});
+
+  // Trades
   client.send('subscribeTrades', { "symbol": currencyPair }, function mirrorReply (error, reply) {
     console.log('Subscribe trades reply:', reply);
   });
 
-  // Orderbook
-  client.expose('snapshotOrderbook', function snapshotOrderbook(params, reply) {
-    viewList(currencyPair, params);
-
-    console.log('Orderbook snapshot received');
-  });
-
-  client.expose('updateOrderbook', function updateOrderbook(params, reply) {
-    viewList(currencyPair, params);
-
-    console.log('Orderbook snapshot updated');
-  });
-
-  // Trades
   client.expose('snapshotTrades', function snapshotTrades(params, reply) {
     viewTradesList(currencyPair, params);
 
