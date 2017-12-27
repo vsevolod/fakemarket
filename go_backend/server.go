@@ -2,9 +2,11 @@ package main
 
 import (
 	"os"
+	"time"
 
 	"github.com/vsevolod/fakemarket/go_backend/controller"
 	"github.com/vsevolod/fakemarket/go_backend/library/config"
+	"github.com/go-pg/pg"
 	"github.com/labstack/echo"
 	"go.uber.org/zap"
 )
@@ -26,8 +28,19 @@ func main() {
 		logger.Fatal("Error while loading configuration file", zap.Error(err))
 	}
 
+	db := pg.Connect(&pg.Options{
+		User:        config.Database.Username,
+		Password:    config.Database.Password,
+		Database:    config.Database.Database,
+		Addr:        config.Database.Host,
+		PoolSize:    10,
+		PoolTimeout: time.Second * 10,
+	})
+	defer db.Close()
+
 	c := controller.New(
 		controller.Config(config),
+		controller.Database(db),
 		controller.Logger(logger.Named("controller")),
 	)
 

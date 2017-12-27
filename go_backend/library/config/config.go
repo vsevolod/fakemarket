@@ -7,7 +7,15 @@ import (
 )
 
 type Config struct {
-	Address string `yaml:"address"`
+	Address  string         `yaml:"address"`
+	Database DatabaseConfig `yaml:"database"`
+}
+
+type DatabaseConfig struct {
+	Username string `yaml:"username"`
+	Password string `yaml:"password"`
+	Database string `yaml:"database"`
+	Host     string `yaml:"host"`
 }
 
 func New(filename string) (*Config, error) {

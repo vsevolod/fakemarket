@@ -1,4 +1,4 @@
-package controller
+package model
 
 import (
    "github.com/vsevolod/fakemarket/go_backend/library/config"
@@ -6,10 +6,26 @@ import (
    "go.uber.org/zap"
 )
 
-type Options struct {
+type Database struct {
+  Options
+
+	Orm *pg.DB
+}
+
+func New(opts ...Option) *Database {
+	options := newOptions(opts...)
+
+	db := pg.Connect(&pg.Options{})
+
+	return &Database{
+		Options: options,
+		Orm:			db,
+	}
+}
+
+type Option struct {
 	Logger *zap.Logger
 	Config *config.Config
-	DB     *pg.DB
 }
 
 type Option func(opts *Options)
@@ -22,12 +38,6 @@ func newOptions(opts ...Option) Options {
 	}
 
 	return opt
-}
-
-func Database(db *pg.DB) Option {
-	return func(o *Options) {
-		o.DB = db
-	}
 }
 
 func Logger(logger *zap.Logger) Option {
